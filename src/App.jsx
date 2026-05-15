@@ -28,8 +28,14 @@ export default function App() {
   const [board, setBoard] = useState(createInitialBoard());
   const [screen, setScreen] = useState('menu');
   const [statusMessage, setStatusMessage] = useState('');
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [theme, setTheme] = useState('dark');
+  const [language, setLanguage] = useState('Русский');
 
   useEffect(() => {
+    document.body.style.background = theme === 'dark' ? '#070b14' : '#f4f7fb';
+    document.body.style.color = theme === 'dark' ? 'white' : '#111';
+
     const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
     const ws = new WebSocket(`${protocol}://${window.location.hostname}:3001`);
 
@@ -44,7 +50,7 @@ export default function App() {
     };
 
     return () => ws.close();
-  }, []);
+  }, [theme]);
 
   function handleAvatarUpload(event) {
     const file = event.target.files[0];
@@ -95,7 +101,7 @@ export default function App() {
   }
 
   return (
-    <div className="app">
+    <div className={`app ${theme}`}>
       <div className="background-glow"></div>
 
       <header className="topbar fade-in">
@@ -110,13 +116,40 @@ export default function App() {
 
         {loggedIn && (
           <div className="profile-area">
-            {avatar ? (
-              <img src={avatar} className="avatar" alt="avatar" />
-            ) : (
-              <div className="avatar empty-avatar">?</div>
-            )}
+            <div className="avatar-button" onClick={() => setMenuOpen(!menuOpen)}>
+              {avatar ? (
+                <img src={avatar} className="avatar" alt="avatar" />
+              ) : (
+                <div className="avatar empty-avatar">?</div>
+              )}
+            </div>
 
-            <div className="profile-pill">{nickname}</div>
+            {menuOpen && (
+              <div className="dropdown-menu fade-in">
+                <div className="menu-card">
+                  <h3>Профиль</h3>
+                  <p><strong>Ник:</strong> {nickname}</p>
+                  <p><strong>Побед:</strong> 0</p>
+                  <p><strong>Поражений:</strong> 0</p>
+                </div>
+
+                <div className="menu-card">
+                  <h3>Настройки</h3>
+
+                  <label>Тема</label>
+                  <select value={theme} onChange={(e) => setTheme(e.target.value)}>
+                    <option value="dark">Тёмная</option>
+                    <option value="light">Светлая</option>
+                  </select>
+
+                  <label>Язык</label>
+                  <select value={language} onChange={(e) => setLanguage(e.target.value)}>
+                    <option>Русский</option>
+                    <option>English</option>
+                  </select>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </header>
@@ -146,10 +179,7 @@ export default function App() {
             maxLength={16}
           />
 
-          <button
-            disabled={!nickname.trim()}
-            onClick={() => setLoggedIn(true)}
-          >
+          <button disabled={!nickname.trim()} onClick={() => setLoggedIn(true)}>
             Играть
           </button>
         </div>
@@ -169,42 +199,6 @@ export default function App() {
                   {statusMessage}
                 </div>
               )}
-            </div>
-          )}
-
-          {screen === 'search' && (
-            <div className="auth-card centered fade-in">
-              <div className="loader"></div>
-              <h2>Поиск соперника</h2>
-              <p>Ищем свободного игрока...</p>
-            </div>
-          )}
-
-          {screen === 'game' && (
-            <div className="fade-in">
-              <div className="game-toolbar">
-                <button className="active">
-                  Онлайн матч
-                </button>
-
-                <button>
-                  Ход: {turn === 'red' ? 'Красные' : 'Чёрные'}
-                </button>
-              </div>
-
-              <div className="board-wrapper">
-                <div className="board">
-                  {board.map((cell, index) => (
-                    <div
-                      key={index}
-                      onClick={() => handleCellClick(index)}
-                      className={`cell ${cell.dark ? 'dark' : 'light'} ${selectedCell === index ? 'selected' : ''}`}
-                    >
-                      {cell.piece && <div className={`piece ${cell.piece}`} />}
-                    </div>
-                  ))}
-                </div>
-              </div>
             </div>
           )}
         </>

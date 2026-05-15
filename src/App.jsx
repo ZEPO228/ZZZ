@@ -22,13 +22,15 @@ export default function App() {
   const [nickname, setNickname] = useState('');
   const [loggedIn, setLoggedIn] = useState(false);
   const [searching, setSearching] = useState(false);
-  const [onlinePlayers, setOnlinePlayers] = useState(0);
+  const [onlinePlayers, setOnlinePlayers] = useState(1);
   const [matchFound, setMatchFound] = useState(false);
   const [opponent, setOpponent] = useState('');
   const [playerColor, setPlayerColor] = useState('');
   const [selectedCell, setSelectedCell] = useState(null);
   const [turn, setTurn] = useState('red');
   const [board, setBoard] = useState(createInitialBoard());
+  const [screen, setScreen] = useState('menu');
+  const [statusMessage, setStatusMessage] = useState('');
 
   useEffect(() => {
     const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
@@ -38,15 +40,21 @@ export default function App() {
       const data = JSON.parse(event.data);
 
       if (data.type === 'ONLINE_COUNT') {
-        setOnlinePlayers(data.count);
+        setOnlinePlayers(Math.max(1, data.count));
       }
 
       if (data.type === 'MATCH_FOUND') {
         setSearching(false);
         setMatchFound(true);
+        setScreen('game');
         setOpponent(data.opponent);
         setPlayerColor(data.color);
+        setStatusMessage('');
       }
+    };
+
+    ws.onopen = () => {
+      setOnlinePlayers(1);
     };
 
     window.gameSocket = ws;
@@ -58,11 +66,26 @@ export default function App() {
     if (!window.gameSocket) return;
 
     setSearching(true);
+    setStatusMessage('Searching for players...');
 
     window.gameSocket.send(JSON.stringify({
       type: 'QUEUE_JOIN',
       nickname,
     }));
+
+    setTimeout(() => {
+      setSearching(false);
+
+      if (!matchFound) {
+        setScreen('menu');
+        setStatusMessage('No players online right now');
+      }
+    }, 10000);
+  }
+
+  function startSearch() {
+    setScreen('search');
+    queueMatch();
   }
 
   function handleCellClick(index) {
@@ -123,36 +146,68 @@ export default function App() {
         </div>
       ) : (
         <>
-          <div className="game-toolbar">
-            <button className={searching ? 'active' : ''} onClick={queueMatch}>
-              {searching ? 'Searching...' : 'Find Match'}
-            </button>
+          {screen === 'menu' && (
+            <div className="auth-card">
+              <h2>Main Menu</h2>
+              <p>Ready to play online checkers</p>
 
-            <button>{turn.toUpperCase()} TURN</button>
-            <button>{matchFound ? 'ONLINE MATCH' : 'LOCAL MODE'}</button>
-          </div>
+              <button onClick={startSearch}>
+                Play Online
+              </button>
 
-          {matchFound && (
-            <div className="match-banner">
-              <strong>Match Found</strong>
-              <span>{nickname} vs {opponent}</span>
-              <span>You play: {playerColor}</span>
+              {statusMessage && (
+                <p style={{ opacity: 0.7 }}>
+                  {statusMessage}
+                </p>
+              )}
             </div>
           )}
 
-          <div className="board-wrapper">
-            <div className="board">
-              {board.map((cell, index) => (
-                <div
-                  key={index}
-                  onClick={() => handleCellClick(index)}
-                  className={`cell ${cell.dark ? 'dark' : 'light'} ${selectedCell === index ? 'selected' : ''}`}
-                >
-                  {cell.piece && <div className={`piece ${cell.piece}`} />}
-                </div>
-              ))}
+          {screen === 'search' && (
+            <div className="auth-card">
+              <h2>Matchmaking</h2>
+              <p>Searching for online players...</p>
+
+              <button className="active">
+                Searching...
+              </button>
             </div>
-          </div>
+          )}
+
+          {screen === 'game' && (
+            <>
+              <div className="game-toolbar">
+                <button className={searching ? 'active' : ''}>
+                  {searching ? 'Searching...' : 'Match Ready'}
+                </button>
+
+                <button>{turn.toUpperCase()} TURN</button>
+                <button>{matchFound ? 'ONLINE MATCH' : 'LOCAL MODE'}</button>
+              </div>
+
+              {matchFound && (
+                <div className="match-banner">
+                  <strong>Match Found</strong>
+                  <span>{nickname} vs {opponent}</span>
+                  <span>You play: {playerColor}</span>
+                </div>
+              )}
+
+              <div className="board-wrapper">
+                <div className="board">
+                  {board.map((cell, index) => (
+                    <div
+                      key={index}
+                      onClick={() => handleCellClick(index)}
+                      className={`cell ${cell.dark ? 'dark' : 'light'} ${selectedCell === index ? 'selected' : ''}`}
+                    >
+                      {cell.piece && <div className={`piece ${cell.piece}`} />}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
         </>
       )}
     </div>

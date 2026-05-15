@@ -30,13 +30,13 @@ body {
 }
 
 .fade-in {
-  animation: fadeIn 0.35s ease;
+  animation: fadeIn 0.25s ease;
 }
 
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(-8px);
   }
   to {
     opacity: 1;
@@ -70,20 +70,14 @@ body {
   border-radius: 50%;
   background: #00ff88;
   box-shadow: 0 0 12px #00ff88;
-  animation: pulse 1.5s infinite;
-}
-
-@keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.2); }
-  100% { transform: scale(1); }
 }
 
 .profile-area {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  max-width: 42vw;
+  position: relative;
+}
+
+.avatar-button {
+  cursor: pointer;
 }
 
 .avatar {
@@ -92,7 +86,7 @@ body {
   min-width: 46px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid rgba(255,255,255,0.14);
+  border: 2px solid rgba(255,255,255,0.15);
   background: #111827;
 }
 
@@ -110,15 +104,58 @@ body {
   font-size: 28px;
 }
 
-.profile-pill {
+.dropdown-menu {
+  position: absolute;
+  top: 58px;
+  right: 0;
+  width: 290px;
+  background: rgba(14,18,28,0.96);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 24px;
+  backdrop-filter: blur(20px);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 100;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.45);
+}
+
+.menu-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 18px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.menu-card h3 {
+  font-size: 20px;
+  margin-bottom: 2px;
+}
+
+.menu-card p {
+  font-size: 15px;
+  line-height: 1.4;
+  color: rgba(255,255,255,0.82);
+}
+
+.menu-card label {
+  font-size: 13px;
+  opacity: 0.7;
+  margin-top: 4px;
+}
+
+.menu-card select {
   background: rgba(255,255,255,0.06);
-  backdrop-filter: blur(12px);
-  padding: 10px 14px;
-  border-radius: 999px;
-  font-size: 14px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  color: white;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  padding: 12px;
+  font-size: 15px;
+  outline: none;
 }
 
 .avatar-upload {
@@ -207,62 +244,13 @@ button {
   }
 }
 
-.game-toolbar {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
+@media (max-width: 480px) {
+  .dropdown-menu {
+    width: 250px;
+    right: -4px;
+  }
 
-.active {
-  background: linear-gradient(135deg, #00c66f, #00ff88);
-  color: #03140d;
-}
-
-.board-wrapper {
-  display: flex;
-  justify-content: center;
-}
-
-.board {
-  width: min(92vw, 520px);
-  aspect-ratio: 1;
-  display: grid;
-  grid-template-columns: repeat(8, 1fr);
-  border-radius: 24px;
-  overflow: hidden;
-  border: 5px solid rgba(255,255,255,0.08);
-}
-
-.cell {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.selected {
-  outline: 4px solid #00d9ff;
-  outline-offset: -4px;
-}
-
-.light {
-  background: #e5cfac;
-}
-
-.dark {
-  background: #b98a62;
-}
-
-.piece {
-  width: 72%;
-  height: 72%;
-  border-radius: 50%;
-  box-shadow: inset 0 -6px 0 rgba(0,0,0,0.25);
-}
-
-.red {
-  background: linear-gradient(135deg, #ff5f6d, #ff2d55);
-}
-
-.black {
-  background: linear-gradient(135deg, #1a1a1a, #000000);
+  .topbar h1 {
+    font-size: 24px;
+  }
 }

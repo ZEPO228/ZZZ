@@ -1,0 +1,13 @@
+{
+  "name": "checkers-server",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "ws": "^8.18.0",
+    "cors": "^2.8.5"
+  }
+}

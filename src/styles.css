@@ -22,10 +22,10 @@ body {
 
 .app {
   min-height: 100vh;
-  padding: 18px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 22px;
+  gap: 20px;
   position: relative;
 }
 
@@ -51,15 +51,17 @@ body {
 }
 
 .topbar h1 {
-  font-size: 34px;
+  font-size: 28px;
   font-weight: 800;
+  line-height: 1.05;
 }
 
 .online-box {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-top: 8px;
+  margin-top: 10px;
+  font-size: 15px;
 }
 
 .online-dot {
@@ -71,34 +73,32 @@ body {
   animation: pulse 1.5s infinite;
 }
 
-.weather-box {
-  margin-top: 10px;
-  opacity: 0.75;
-  font-size: 14px;
-}
-
 @keyframes pulse {
   0% { transform: scale(1); }
-  50% { transform: scale(1.25); }
+  50% { transform: scale(1.2); }
   100% { transform: scale(1); }
 }
 
 .profile-area {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+  max-width: 42vw;
 }
 
 .avatar {
-  object-fit: cover;
+  width: 46px;
+  height: 46px;
+  min-width: 46px;
   border-radius: 50%;
-  border: 2px solid rgba(255,255,255,0.15);
+  object-fit: cover;
+  border: 2px solid rgba(255,255,255,0.14);
+  background: #111827;
 }
 
 .large-avatar {
-  width: 90px;
-  height: 90px;
-  align-self: center;
+  width: 84px;
+  height: 84px;
 }
 
 .empty-avatar {
@@ -107,14 +107,18 @@ body {
   justify-content: center;
   background: rgba(255,255,255,0.06);
   color: rgba(255,255,255,0.5);
-  font-size: 32px;
+  font-size: 28px;
 }
 
 .profile-pill {
   background: rgba(255,255,255,0.06);
   backdrop-filter: blur(12px);
-  padding: 12px 18px;
+  padding: 10px 14px;
   border-radius: 999px;
+  font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .avatar-upload {
@@ -129,13 +133,14 @@ body {
   padding: 12px 16px;
   border-radius: 14px;
   cursor: pointer;
+  font-size: 14px;
 }
 
 .centered {
   width: 100%;
   max-width: 380px;
   align-self: center;
-  margin-top: 6vh;
+  margin-top: 4vh;
 }
 
 .auth-card {
@@ -143,19 +148,19 @@ body {
   border: 1px solid rgba(255,255,255,0.08);
   backdrop-filter: blur(18px);
   border-radius: 28px;
-  padding: 28px;
+  padding: 24px;
   display: flex;
   flex-direction: column;
   gap: 18px;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.35);
 }
 
 .auth-card h2 {
-  font-size: 30px;
+  font-size: 28px;
 }
 
 .auth-card p {
   opacity: 0.7;
+  line-height: 1.4;
 }
 
 .auth-card input {
@@ -163,7 +168,7 @@ body {
   border: 1px solid rgba(255,255,255,0.08);
   color: white;
   border-radius: 18px;
-  padding: 18px;
+  padding: 16px;
   font-size: 16px;
   outline: none;
 }
@@ -171,7 +176,7 @@ body {
 button {
   border: none;
   border-radius: 18px;
-  padding: 18px;
+  padding: 16px;
   font-size: 16px;
   font-weight: 700;
   background: linear-gradient(135deg, #2d8cff, #005eff);

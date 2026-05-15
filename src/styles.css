@@ -6,16 +6,42 @@
 }
 
 body {
-  background: #101114;
+  background: #070b14;
   color: white;
+  overflow-x: hidden;
+}
+
+.background-glow {
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(circle at top left, rgba(0,140,255,0.18), transparent 35%),
+    radial-gradient(circle at bottom right, rgba(0,255,170,0.12), transparent 35%);
+  pointer-events: none;
 }
 
 .app {
   min-height: 100vh;
-  padding: 16px;
+  padding: 18px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 22px;
+  position: relative;
+}
+
+.fade-in {
+  animation: fadeIn 0.35s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .topbar {
@@ -25,68 +51,136 @@ body {
 }
 
 .topbar h1 {
-  font-size: 26px;
+  font-size: 34px;
+  font-weight: 800;
 }
 
-.topbar p {
-  opacity: 0.7;
-  margin-top: 4px;
+.online-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  opacity: 0.85;
+}
+
+.online-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #00ff88;
+  box-shadow: 0 0 12px #00ff88;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.25); }
+  100% { transform: scale(1); }
 }
 
 .profile-pill {
-  background: #1f232b;
-  padding: 10px 14px;
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(12px);
+  padding: 12px 18px;
   border-radius: 999px;
 }
 
+.centered {
+  width: 100%;
+  max-width: 380px;
+  align-self: center;
+  margin-top: 8vh;
+}
+
 .auth-card {
-  background: #181b20;
-  border-radius: 20px;
-  padding: 24px;
+  background: rgba(19,24,34,0.82);
+  border: 1px solid rgba(255,255,255,0.08);
+  backdrop-filter: blur(18px);
+  border-radius: 28px;
+  padding: 28px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 18px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.35);
+}
+
+.auth-card h2 {
+  font-size: 30px;
+}
+
+.auth-card p {
+  opacity: 0.7;
+  line-height: 1.4;
 }
 
 .auth-card input {
-  background: #0f1115;
-  border: 1px solid #2f3640;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
   color: white;
-  border-radius: 14px;
-  padding: 16px;
+  border-radius: 18px;
+  padding: 18px;
   font-size: 16px;
+  outline: none;
+  transition: 0.2s;
+}
+
+.auth-card input:focus {
+  border-color: #2d8cff;
+  transform: scale(1.01);
 }
 
 button {
   border: none;
-  border-radius: 14px;
-  padding: 16px;
+  border-radius: 18px;
+  padding: 18px;
   font-size: 16px;
-  background: #2d6df6;
+  font-weight: 700;
+  background: linear-gradient(135deg, #2d8cff, #005eff);
   color: white;
+  transition: 0.2s;
+}
+
+button:active {
+  transform: scale(0.97);
 }
 
 button:disabled {
   opacity: 0.5;
 }
 
+.status-message {
+  background: rgba(255,80,80,0.12);
+  border: 1px solid rgba(255,80,80,0.25);
+  padding: 14px;
+  border-radius: 16px;
+  color: #ff9d9d;
+}
+
+.loader {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  border: 5px solid rgba(255,255,255,0.1);
+  border-top-color: #2d8cff;
+  align-self: center;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .game-toolbar {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr;
   gap: 10px;
 }
 
 .active {
-  background: #2ecc71;
-}
-
-.match-banner {
-  background: #1b2028;
-  border-radius: 18px;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+  background: linear-gradient(135deg, #00c66f, #00ff88);
+  color: #03140d;
 }
 
 .board-wrapper {
@@ -99,41 +193,59 @@ button:disabled {
   aspect-ratio: 1;
   display: grid;
   grid-template-columns: repeat(8, 1fr);
-  border-radius: 20px;
+  border-radius: 24px;
   overflow: hidden;
-  border: 4px solid #222831;
+  border: 5px solid rgba(255,255,255,0.08);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4);
 }
 
 .cell {
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: 0.15s;
+}
+
+.cell:active {
+  transform: scale(0.96);
 }
 
 .selected {
-  outline: 3px solid #00e1ff;
-  outline-offset: -3px;
+  outline: 4px solid #00d9ff;
+  outline-offset: -4px;
 }
 
 .light {
-  background: #f1d9b5;
+  background: #e5cfac;
 }
 
 .dark {
-  background: #b58863;
+  background: #b98a62;
 }
 
 .piece {
   width: 72%;
   height: 72%;
   border-radius: 50%;
-  box-shadow: inset 0 -5px 0 rgba(0,0,0,0.25);
+  box-shadow: inset 0 -6px 0 rgba(0,0,0,0.25);
+  animation: pieceSpawn 0.2s ease;
+}
+
+@keyframes pieceSpawn {
+  from {
+    transform: scale(0.7);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .red {
-  background: #ff4d4f;
+  background: linear-gradient(135deg, #ff5f6d, #ff2d55);
 }
 
 .black {
-  background: #1c1c1c;
+  background: linear-gradient(135deg, #1a1a1a, #000000);
 }

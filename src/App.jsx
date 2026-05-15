@@ -28,7 +28,6 @@ export default function App() {
   const [board, setBoard] = useState(createInitialBoard());
   const [screen, setScreen] = useState('menu');
   const [statusMessage, setStatusMessage] = useState('');
-  const [weather] = useState('☀️ +22°C');
 
   useEffect(() => {
     const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
@@ -106,10 +105,6 @@ export default function App() {
           <div className="online-box">
             <div className="online-dot"></div>
             <span>{onlinePlayers} игроков онлайн</span>
-          </div>
-
-          <div className="weather-box">
-            {weather}
           </div>
         </div>
 

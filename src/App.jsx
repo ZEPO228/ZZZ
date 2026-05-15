@@ -21,11 +21,7 @@ function createInitialBoard() {
 export default function App() {
   const [nickname, setNickname] = useState('');
   const [loggedIn, setLoggedIn] = useState(false);
-  const [searching, setSearching] = useState(false);
   const [onlinePlayers, setOnlinePlayers] = useState(1);
-  const [matchFound, setMatchFound] = useState(false);
-  const [opponent, setOpponent] = useState('');
-  const [playerColor, setPlayerColor] = useState('');
   const [selectedCell, setSelectedCell] = useState(null);
   const [turn, setTurn] = useState('red');
   const [board, setBoard] = useState(createInitialBoard());
@@ -36,56 +32,26 @@ export default function App() {
     const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
     const ws = new WebSocket(`${protocol}://${window.location.hostname}:3001`);
 
+    ws.onopen = () => setOnlinePlayers(1);
+
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
 
       if (data.type === 'ONLINE_COUNT') {
         setOnlinePlayers(Math.max(1, data.count));
       }
-
-      if (data.type === 'MATCH_FOUND') {
-        setSearching(false);
-        setMatchFound(true);
-        setScreen('game');
-        setOpponent(data.opponent);
-        setPlayerColor(data.color);
-        setStatusMessage('');
-      }
     };
-
-    ws.onopen = () => {
-      setOnlinePlayers(1);
-    };
-
-    window.gameSocket = ws;
 
     return () => ws.close();
   }, []);
 
-  function queueMatch() {
-    if (!window.gameSocket) return;
-
-    setSearching(true);
-    setStatusMessage('Searching for players...');
-
-    window.gameSocket.send(JSON.stringify({
-      type: 'QUEUE_JOIN',
-      nickname,
-    }));
-
-    setTimeout(() => {
-      setSearching(false);
-
-      if (!matchFound) {
-        setScreen('menu');
-        setStatusMessage('No players online right now');
-      }
-    }, 10000);
-  }
-
   function startSearch() {
     setScreen('search');
-    queueMatch();
+
+    setTimeout(() => {
+      setScreen('menu');
+      setStatusMessage('Сейчас нет свободных игроков');
+    }, 10000);
   }
 
   function handleCellClick(index) {
@@ -95,7 +61,6 @@ export default function App() {
       if (cell.piece === turn) {
         setSelectedCell(index);
       }
-
       return;
     }
 
@@ -116,24 +81,30 @@ export default function App() {
 
   return (
     <div className="app">
-      <header className="topbar">
+      <div className="background-glow"></div>
+
+      <header className="topbar fade-in">
         <div>
-          <h1>Checkers Online</h1>
-          <p>{onlinePlayers} players online</p>
+          <h1>Шашки Онлайн</h1>
+
+          <div className="online-box">
+            <div className="online-dot"></div>
+            <span>{onlinePlayers} игроков онлайн</span>
+          </div>
         </div>
 
         {loggedIn && <div className="profile-pill">{nickname}</div>}
       </header>
 
       {!loggedIn ? (
-        <div className="auth-card">
-          <h2>Quick Login</h2>
-          <p>Enter nickname to start playing online</p>
+        <div className="auth-card centered fade-in">
+          <h2>Добро пожаловать</h2>
+          <p>Войди чтобы начать игру</p>
 
           <input
             value={nickname}
             onChange={(e) => setNickname(e.target.value)}
-            placeholder="Nickname"
+            placeholder="Введите никнейм"
             maxLength={16}
           />
 
@@ -141,57 +112,47 @@ export default function App() {
             disabled={!nickname.trim()}
             onClick={() => setLoggedIn(true)}
           >
-            Enter Game
+            Играть
           </button>
         </div>
       ) : (
         <>
           {screen === 'menu' && (
-            <div className="auth-card">
-              <h2>Main Menu</h2>
-              <p>Ready to play online checkers</p>
+            <div className="auth-card centered fade-in">
+              <h2>Главное меню</h2>
+              <p>Сразись против других игроков онлайн</p>
 
               <button onClick={startSearch}>
-                Play Online
+                Найти матч
               </button>
 
               {statusMessage && (
-                <p style={{ opacity: 0.7 }}>
+                <div className="status-message">
                   {statusMessage}
-                </p>
+                </div>
               )}
             </div>
           )}
 
           {screen === 'search' && (
-            <div className="auth-card">
-              <h2>Matchmaking</h2>
-              <p>Searching for online players...</p>
-
-              <button className="active">
-                Searching...
-              </button>
+            <div className="auth-card centered fade-in">
+              <div className="loader"></div>
+              <h2>Поиск соперника</h2>
+              <p>Ищем свободного игрока...</p>
             </div>
           )}
 
           {screen === 'game' && (
-            <>
+            <div className="fade-in">
               <div className="game-toolbar">
-                <button className={searching ? 'active' : ''}>
-                  {searching ? 'Searching...' : 'Match Ready'}
+                <button className="active">
+                  Онлайн матч
                 </button>
 
-                <button>{turn.toUpperCase()} TURN</button>
-                <button>{matchFound ? 'ONLINE MATCH' : 'LOCAL MODE'}</button>
+                <button>
+                  Ход: {turn === 'red' ? 'Красные' : 'Чёрные'}
+                </button>
               </div>
-
-              {matchFound && (
-                <div className="match-banner">
-                  <strong>Match Found</strong>
-                  <span>{nickname} vs {opponent}</span>
-                  <span>You play: {playerColor}</span>
-                </div>
-              )}
 
               <div className="board-wrapper">
                 <div className="board">
@@ -206,7 +167,7 @@ export default function App() {
                   ))}
                 </div>
               </div>
-            </>
+            </div>
           )}
         </>
       )}

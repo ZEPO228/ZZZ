@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 
-function createBoard() {
-  const board = [];
+function createInitialBoard() {
+  const cells = [];
 
   for (let row = 0; row < 8; row++) {
     for (let col = 0; col < 8; col++) {
@@ -11,11 +11,11 @@ function createBoard() {
       if (dark && row < 3) piece = 'black';
       if (dark && row > 4) piece = 'red';
 
-      board.push({ row, col, dark, piece });
+      cells.push({ row, col, dark, piece });
     }
   }
 
-  return board;
+  return cells;
 }
 
 export default function App() {
@@ -27,11 +27,12 @@ export default function App() {
   const [opponent, setOpponent] = useState('');
   const [playerColor, setPlayerColor] = useState('');
   const [selectedCell, setSelectedCell] = useState(null);
-
-  const board = useMemo(() => createBoard(), []);
+  const [turn, setTurn] = useState('red');
+  const [board, setBoard] = useState(createInitialBoard());
 
   useEffect(() => {
-    const ws = new WebSocket('ws://localhost:3001');
+    const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+    const ws = new WebSocket(`${protocol}://${window.location.hostname}:3001`);
 
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
@@ -62,6 +63,32 @@ export default function App() {
       type: 'QUEUE_JOIN',
       nickname,
     }));
+  }
+
+  function handleCellClick(index) {
+    const cell = board[index];
+
+    if (selectedCell === null) {
+      if (cell.piece === turn) {
+        setSelectedCell(index);
+      }
+
+      return;
+    }
+
+    const selected = board[selectedCell];
+
+    if (!cell.piece && cell.dark) {
+      const updated = [...board];
+      updated[index].piece = selected.piece;
+      updated[selectedCell].piece = null;
+
+      setBoard(updated);
+      setSelectedCell(null);
+      setTurn(turn === 'red' ? 'black' : 'red');
+    } else {
+      setSelectedCell(null);
+    }
   }
 
   return (
@@ -101,8 +128,8 @@ export default function App() {
               {searching ? 'Searching...' : 'Find Match'}
             </button>
 
-            <button>Leaderboard</button>
-            <button>Profile</button>
+            <button>{turn.toUpperCase()} TURN</button>
+            <button>{matchFound ? 'ONLINE MATCH' : 'LOCAL MODE'}</button>
           </div>
 
           {matchFound && (
@@ -118,7 +145,7 @@ export default function App() {
               {board.map((cell, index) => (
                 <div
                   key={index}
-                  onClick={() => setSelectedCell(index)}
+                  onClick={() => handleCellClick(index)}
                   className={`cell ${cell.dark ? 'dark' : 'light'} ${selectedCell === index ? 'selected' : ''}`}
                 >
                   {cell.piece && <div className={`piece ${cell.piece}`} />}

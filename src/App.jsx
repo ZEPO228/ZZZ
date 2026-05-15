@@ -20,6 +20,7 @@ function createInitialBoard() {
 
 export default function App() {
   const [nickname, setNickname] = useState('');
+  const [avatar, setAvatar] = useState('');
   const [loggedIn, setLoggedIn] = useState(false);
   const [onlinePlayers, setOnlinePlayers] = useState(1);
   const [selectedCell, setSelectedCell] = useState(null);
@@ -27,6 +28,7 @@ export default function App() {
   const [board, setBoard] = useState(createInitialBoard());
   const [screen, setScreen] = useState('menu');
   const [statusMessage, setStatusMessage] = useState('');
+  const [weather] = useState('☀️ +22°C');
 
   useEffect(() => {
     const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
@@ -44,6 +46,20 @@ export default function App() {
 
     return () => ws.close();
   }, []);
+
+  function handleAvatarUpload(event) {
+    const file = event.target.files[0];
+
+    if (!file) return;
+
+    const reader = new FileReader();
+
+    reader.onloadend = () => {
+      setAvatar(reader.result);
+    };
+
+    reader.readAsDataURL(file);
+  }
 
   function startSearch() {
     setScreen('search');
@@ -91,15 +107,42 @@ export default function App() {
             <div className="online-dot"></div>
             <span>{onlinePlayers} игроков онлайн</span>
           </div>
+
+          <div className="weather-box">
+            {weather}
+          </div>
         </div>
 
-        {loggedIn && <div className="profile-pill">{nickname}</div>}
+        {loggedIn && (
+          <div className="profile-area">
+            {avatar ? (
+              <img src={avatar} className="avatar" alt="avatar" />
+            ) : (
+              <div className="avatar empty-avatar">?</div>
+            )}
+
+            <div className="profile-pill">{nickname}</div>
+          </div>
+        )}
       </header>
 
       {!loggedIn ? (
         <div className="auth-card centered fade-in">
           <h2>Добро пожаловать</h2>
           <p>Войди чтобы начать игру</p>
+
+          <div className="avatar-upload">
+            {avatar ? (
+              <img src={avatar} className="avatar large-avatar" alt="avatar" />
+            ) : (
+              <div className="avatar large-avatar empty-avatar">+</div>
+            )}
+
+            <label className="upload-button">
+              Загрузить аватар
+              <input type="file" accept="image/*" hidden onChange={handleAvatarUpload} />
+            </label>
+          </div>
 
           <input
             value={nickname}
